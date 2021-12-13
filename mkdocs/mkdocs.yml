@@ -1,0 +1,4 @@
+site_name: CDK Resources
+nav:
+    - Home: README.md
+theme: readthedocs
