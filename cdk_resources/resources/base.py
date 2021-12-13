@@ -1,4 +1,3 @@
-import copy
 import inspect
 import typing
 
@@ -7,11 +6,12 @@ from aws_cdk import core
 from utils import combine_configurations, app_context
 
 
-__all__ = ["Resource"]
-T = typing.TypeVar("T")
+__all__ = ["Resource", "ResourceType"]
+
+ResourceType = typing.TypeVar("ResourceType")
 
 
-class Resource(typing.Generic[T]):
+class Resource(typing.Generic[ResourceType]):
     """ """
 
     # Construct attrs
@@ -29,7 +29,7 @@ class Resource(typing.Generic[T]):
         force_lookup: bool = False,
         *args,
         **kwargs,
-    ) -> T:
+    ) -> ResourceType:
         if hasattr(cls, "construct") and force_lookup is False:
             return cls.construct
         scope = scope or app_context["current_stack"]
@@ -38,6 +38,7 @@ class Resource(typing.Generic[T]):
         if force_lookup is True:
             return cls.lookup(scope, construct_id, *args, **kwargs)
         cls.construct = cls.create(scope, construct_id, *args, **kwargs)
+        cls.post_create()
         return cls.construct
 
     @classmethod
@@ -72,11 +73,10 @@ class Resource(typing.Generic[T]):
 
     # region Construct Create
     @classmethod
-    def create(cls, scope: core.Stack, construct_id: str, *args, **kwargs) -> T:
+    def create(cls, scope: core.Stack, construct_id: str, *args, **kwargs) -> ResourceType:
         construct_class = cls.get_construct_class(*args, **kwargs)
         construct_props = cls.get_construct_props(*args, **kwargs)
         construct = construct_class(scope, construct_id, **construct_props)
-        cls.post_create(construct, construct_props)
         return construct
 
     @classmethod
@@ -98,7 +98,7 @@ class Resource(typing.Generic[T]):
         return construct_props
 
     @classmethod
-    def post_create(cls, construct: T, construct_props: dict) -> None:
+    def post_create(cls, construct_props: dict) -> None:
         pass
 
     # endregion

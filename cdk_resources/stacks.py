@@ -3,7 +3,11 @@ import typing
 
 from aws_cdk import core
 
-from utils import app_context, ENVIRONMENT_CONTEXT_KEY, ALLOWED_ENVIRONMENTS
+from cdk_resources.utils import (
+    app_context,
+    ENVIRONMENT_CONTEXT_KEY,
+    ALLOWED_ENVIRONMENTS,
+)
 
 
 __all__ = ["ResourceStack", "register_stacks"]

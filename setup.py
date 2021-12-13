@@ -25,7 +25,9 @@ setuptools.setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     author=version["__author__"],
-    packages=setuptools.find_packages(exclude=["tests*", "samples*", "mkdocs*"]),
+    packages=setuptools.find_packages(
+        exclude=["tests*", "samples*", "mkdocs*"]
+    ),
     # package_dir={"": "cdk_resources"},
     package_data={"": ["LICENSE"]},
     install_requires=["aws-cdk.core>=1.0.0", "boto3==1.20.23"],
@@ -44,7 +46,8 @@ setuptools.setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Topic :: Software Development :: Code Generators",
-        "Topic :: Software Development :: Libraries" "Topic :: Utilities",
-        "Typing :: Typed"
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Utilities",
+        "Typing :: Typed",
     ],
 )
