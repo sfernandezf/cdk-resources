@@ -98,7 +98,7 @@ class Resource(typing.Generic[ResourceType]):
         return construct_props
 
     @classmethod
-    def post_create(cls, construct_props: dict) -> None:
+    def post_create(cls) -> None:
         pass
 
     # endregion
