@@ -41,6 +41,16 @@ class Resource(typing.Generic[ResourceType]):
         cls.post_create(cls.construct)
         return cls.construct
 
+    def __init__(
+        self: ResourceType,
+        scope: typing.Optional[core.Stack] = None,
+        construct_id: typing.Optional[str] = None,
+        force_lookup: bool = False,
+        *args,
+        **kwargs,
+    ):
+        pass
+
     @classmethod
     def render_props(cls, configurations: typing.Union[list, dict]) -> dict:
         def transform_value(value):
