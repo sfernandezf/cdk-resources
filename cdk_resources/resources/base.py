@@ -38,7 +38,7 @@ class Resource(typing.Generic[ResourceType]):
         if force_lookup is True:
             return cls.lookup(scope, construct_id, *args, **kwargs)
         cls.construct = cls.create(scope, construct_id, *args, **kwargs)
-        cls.post_create()
+        cls.post_create(cls.construct)
         return cls.construct
 
     @classmethod
@@ -98,7 +98,7 @@ class Resource(typing.Generic[ResourceType]):
         return construct_props
 
     @classmethod
-    def post_create(cls) -> None:
+    def post_create(cls, construct: ResourceType) -> None:
         pass
 
     # endregion
