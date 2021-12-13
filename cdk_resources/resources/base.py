@@ -3,7 +3,7 @@ import typing
 
 from aws_cdk import core
 
-from utils import combine_configurations, app_context
+from cdk_resources.utils import combine_configurations, app_context
 
 
 __all__ = ["Resource", "ResourceType"]
