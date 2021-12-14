@@ -36,14 +36,18 @@ def combine_configurations(
         return filter_config(config.get(COMMON_ENVIRONMENT_KEY, config))
 
     environments = ALLOWED_ENVIRONMENTS + [COMMON_ENVIRONMENT_KEY]
-    env_config = {k: v for k, v in config.items() if k in environments}
+    env_config = (
+        {k: v for k, v in config.items() if k in environments}
+        if len(ALLOWED_ENVIRONMENTS) > 0
+        else config
+    )
     if len(env_config) == 0:
         # Not environment app
         return filter_config(config)
 
     combined_config = dict(
         env_config.get(COMMON_ENVIRONMENT_KEY, {}),
-        **config.get(environment, {}),
+        **env_config.get(environment, {}),
     )
     return filter_config(combined_config)
 

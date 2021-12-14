@@ -29,17 +29,26 @@ class Resource(typing.Generic[ResourceType]):
         force_lookup: bool = False,
         *args,
         **kwargs,
-    ) -> ResourceType:
+    ):
         if hasattr(cls, "construct") and force_lookup is False:
-            return cls.construct
+            return cls
         scope = scope or app_context["current_stack"]
         assert isinstance(scope, core.Stack), "Scope is required"
         assert isinstance(construct_id, str), "construct_id is required"
         if force_lookup is True:
-            return cls.lookup(scope, construct_id, *args, **kwargs)
-        cls.construct = cls.create(scope, construct_id, *args, **kwargs)
-        cls.post_create(cls.construct)
-        return cls.construct
+            construct = cls.lookup(scope, construct_id, *args, **kwargs)
+        elif cls.construct_props is not None:
+            construct = cls.create(scope, construct_id, *args, **kwargs)
+            cls.post_create(construct)
+        elif (
+            cls.construct_lookup_props is not None
+            and cls.construct_lookup_method is not None
+        ):
+            construct = cls.lookup(scope, construct_id, *args, **kwargs)
+        else:
+            raise Exception(f"Incorrect configuration {cls}")
+        cls.construct = construct
+        return cls
 
     def __init__(
         self: ResourceType,
@@ -55,9 +64,9 @@ class Resource(typing.Generic[ResourceType]):
     def render_props(cls, configurations: typing.Union[list, dict]) -> dict:
         def transform_value(value):
             if isinstance(value, tuple):
-                return getattr(value[0].get(), value[1])
+                return getattr(value[0]().construct, value[1])
             if inspect.isclass(value) is True and issubclass(value, cls):
-                return value()
+                return value().construct
             if hasattr(value, "__call__"):
                 return value()
             if (
@@ -81,9 +90,16 @@ class Resource(typing.Generic[ResourceType]):
                     configurations[key] = transform_value(value)
         return configurations
 
+    @classmethod
+    def get(cls) -> ResourceType:
+        assert hasattr(cls, "construct"), f"{cls} has not being initializated"
+        return cls.construct
+
     # region Construct Create
     @classmethod
-    def create(cls, scope: core.Stack, construct_id: str, *args, **kwargs) -> ResourceType:
+    def create(
+        cls, scope: core.Stack, construct_id: str, *args, **kwargs
+    ) -> ResourceType:
         construct_class = cls.get_construct_class(*args, **kwargs)
         construct_props = cls.get_construct_props(*args, **kwargs)
         construct = construct_class(scope, construct_id, **construct_props)
@@ -118,7 +134,7 @@ class Resource(typing.Generic[ResourceType]):
     def lookup(cls, scope: core.Stack, construct_id: str, *args, **kwargs):
         construct_class = cls.get_construct_class(*args, **kwargs)
         construct_lookup_method = cls.get_construct_lookup_method(
-            *args, **kwargs
+            construct_class, *args, **kwargs
         )
         construct_lookup_props = cls.get_construct_lookup_props(*args, **kwargs)
         construct = getattr(construct_class, construct_lookup_method)(
@@ -136,7 +152,7 @@ class Resource(typing.Generic[ResourceType]):
         ), "construct_lookup_method is required"
         assert hasattr(construct_class, construct_lookup_method) and hasattr(
             getattr(construct_class, construct_lookup_method), "__call__"
-        ), "Incorrect construct_lookup_method"
+        ), f"Incorrect construct_lookup_method {construct_lookup_method} for {construct_class}"
         return construct_lookup_method
 
     @classmethod

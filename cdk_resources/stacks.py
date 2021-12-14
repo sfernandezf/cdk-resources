@@ -36,7 +36,7 @@ class ResourceStack(core.Stack):
             setattr(
                 self,
                 resource_name,
-                Resource.get(
+                Resource(
                     scope=self,
                     construct_id=resources[0],
                     **resource_attrs,
