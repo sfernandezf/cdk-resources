@@ -1,12 +1,12 @@
-import os
+from functools import lru_cache
 import typing
 
 from aws_cdk import core
 
 from cdk_resources.utils import (
     app_context,
-    ENVIRONMENT_CONTEXT_KEY,
     ALLOWED_ENVIRONMENTS,
+    get_environment,
 )
 
 
@@ -24,7 +24,12 @@ class ResourceStack(core.Stack):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
         # Update Context
-        app_context.update(current_stack=self)
+        app_context.update(app=scope, current_stack=self)
+        if self.is_valid_environment is False:
+            raise Exception(
+                f"`{get_environment()}` must be a valid environment allowed "
+                f"values {ALLOWED_ENVIRONMENTS}"
+            )
 
         # Existing resources
         for resources in self.EXISTING_RESOURCES or []:
@@ -57,21 +62,18 @@ class ResourceStack(core.Stack):
     def get_resource_name(value: typing.Union[str, typing.Callable]) -> str:
         return value() if hasattr(value, "__call__") else value
 
+    @property
+    @lru_cache(maxsize=None)
+    def is_valid_environment(self) -> bool:
+        if len(ALLOWED_ENVIRONMENTS) == 0:
+            return True
+        environment = get_environment()
+        return environment is not None and environment in ALLOWED_ENVIRONMENTS
+
 
 def register_stacks(
     app: core.App, aws_env: core.Environment, stacks: list
 ) -> None:
-    # Context
-    environment = app.node.try_get_context(
-        ENVIRONMENT_CONTEXT_KEY
-    ) or os.getenv(ENVIRONMENT_CONTEXT_KEY.upper())
-    if len(ALLOWED_ENVIRONMENTS) > 0:
-        assert environment is not None, "`environment` context is required"
-        assert (
-            environment in ALLOWED_ENVIRONMENTS
-        ), f"`{environment}` must be a valid environment allowed values {ALLOWED_ENVIRONMENTS}"
-    app_context.update(app=app, aws_env=aws_env, environment=environment)
-
     # Create Stacks
     for stack in stacks:
         stack_id, stack_class, stack_kwargs = (

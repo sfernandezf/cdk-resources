@@ -1,0 +1,4 @@
+aws-cdk.core==1.135.0
+aws_cdk.aws_dynamodb==1.135.0
+aws_cdk.aws_sns==1.135.0
+aws_cdk.aws_rds==1.135.0

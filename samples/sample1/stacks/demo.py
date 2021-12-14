@@ -1,6 +1,6 @@
 from cdk_resources import ResourceStack
 
-from resources import TestQueue
+from ..resources import TestQueue
 
 __all__ = ["DemoStack"]
 

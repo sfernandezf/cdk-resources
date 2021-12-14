@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 import typing
 
 
@@ -30,7 +31,7 @@ def combine_configurations(
         return config
 
     # Environments
-    environment = app_context["environment"]
+    environment = get_environment()
     if environment is None:
         # Not environment app
         return filter_config(config.get(COMMON_ENVIRONMENT_KEY, config))
@@ -56,3 +57,12 @@ def get_context_variable(key: str) -> typing.Any:
     context_variable = app_context["app"].node.try_get_context(key)
     context_variable = combine_configurations(context_variable)
     return context_variable
+
+
+@lru_cache(maxsize=None)
+def get_environment() -> typing.Optional[str]:
+    environment =  app_context["app"].node.try_get_context(
+        ENVIRONMENT_CONTEXT_KEY
+    ) or os.getenv(ENVIRONMENT_CONTEXT_KEY.upper())
+    app_context[ENVIRONMENT_CONTEXT_KEY] = environment
+    return environment
