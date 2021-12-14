@@ -6,7 +6,7 @@ from aws_cdk import core
 from cdk_resources.utils import combine_configurations, app_context
 
 
-__all__ = ["Resource", "ResourceType"]
+__all__ = ["Resource", "ResourceType", "ResourceTagMixin"]
 
 ResourceType = typing.TypeVar("ResourceType")
 
@@ -166,3 +166,14 @@ class Resource(typing.Generic[ResourceType]):
         return construct_lookup_props
 
     # endregion
+
+
+class ResourceTagMixin:
+    construct_tags = None
+
+    @classmethod
+    def post_create(cls, construct: ResourceType) -> None:
+        super().post_create(construct)
+        for key, value in cls.construct_tags or []:
+            value = value if isinstance(value, str) else value()
+            core.Tags.of(construct).add(key, value)

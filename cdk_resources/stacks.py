@@ -1,4 +1,4 @@
-from functools import lru_cache
+import functools
 import typing
 
 from aws_cdk import core
@@ -20,9 +20,9 @@ class ResourceStack(core.Stack):
     RESOURCES = None
 
     def __init__(
-        self, scope: core.Construct, construct_id: str, **kwargs
+        self, scope: core.App, stack_id: str, **kwargs
     ) -> None:
-        super().__init__(scope, construct_id, **kwargs)
+        super().__init__(scope, stack_id, **kwargs)
         # Update Context
         app_context.update(app=scope, current_stack=self)
         if self.is_valid_environment is False:
@@ -63,7 +63,7 @@ class ResourceStack(core.Stack):
         return value() if hasattr(value, "__call__") else value
 
     @property
-    @lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def is_valid_environment(self) -> bool:
         if len(ALLOWED_ENVIRONMENTS) == 0:
             return True

@@ -53,5 +53,6 @@ def test_sample(name, stack_class, template_resources):
         env=core.Environment(account="fake", region="us-east-1")
     )
     template = Template.from_stack(stack)
+    print(template.to_json())
     for resource, count in template_resources:
         template.resource_count_is(resource, count)
