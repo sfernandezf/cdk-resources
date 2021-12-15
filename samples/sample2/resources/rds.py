@@ -38,12 +38,12 @@ class PostgreSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
                     aws_ec2.InstanceSize.MEDIUM,
                 ),
                 security_groups=[PostgreSqlRdsDatabaseSg.get()],
-                vpc=DefaultVpc().construct,
+                vpc=DefaultVpc.get(),
                 vpc_subnets=aws_ec2.SubnetSelection(
                     subnets=[
-                        DefaultPrivateDbASubnet().construct,
-                        DefaultPrivateDbBSubnet().construct,
-                        DefaultPrivateDbCSubnet().construct,
+                        DefaultPrivateDbASubnet.get(),
+                        DefaultPrivateDbBSubnet.get(),
+                        DefaultPrivateDbCSubnet.get(),
                     ]
                 ),
                 parameter_group=PostgreSqlParameterGroup().construct,
@@ -58,9 +58,9 @@ class PostgreSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
             instances=2,
             vpc_subnets=lambda: aws_ec2.SubnetSelection(
                 subnets=[
-                    DefaultPrivateDbASubnet().construct,
-                    DefaultPrivateDbCSubnet().construct,
-                    DefaultPrivateDbCSubnet().construct,
+                    DefaultPrivateDbASubnet.get(),
+                    DefaultPrivateDbCSubnet.get(),
+                    DefaultPrivateDbCSubnet.get()
                 ]
             ),
         ),
