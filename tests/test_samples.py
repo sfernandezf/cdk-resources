@@ -3,7 +3,6 @@ import sys
 import subprocess
 
 from aws_cdk import core
-from aws_cdk.assertions import Match, Template
 import pytest
 
 from samples.sample1.stacks import DemoStack
@@ -34,25 +33,23 @@ TEST_DATA = [
 ]
 
 
+def import_class(path):
+    components = path.split('.')
+    mod = __import__(components[0])
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
 @pytest.mark.parametrize("name,stack_class,template_resources", TEST_DATA)
 def test_sample(name, stack_class, template_resources):
-    subprocess.check_call(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "-r",
-            f"samples/{name}/requirements.txt",
-        ]
-    )
-
-    stack = stack_class(
-        core.App(context=dict(environment="dev")),
-        name,
-        env=core.Environment(account="fake", region="us-east-1")
-    )
-    template = Template.from_stack(stack)
-    print(template.to_json())
-    for resource, count in template_resources:
-        template.resource_count_is(resource, count)
+        stack = stack_class(
+            core.App(context=dict(environment="dev")),
+            name,
+            env=core.Environment(account="fake", region="us-east-1")
+        )
+        from aws_cdk.assertions import Template
+        template = Template.from_stack(stack)
+        print(template.to_json())
+        for resource, count in template_resources:
+            template.resource_count_is(resource, count)

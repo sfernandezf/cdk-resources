@@ -39,7 +39,6 @@ class Resource(typing.Generic[ResourceType]):
             construct = cls.lookup(scope, construct_id, *args, **kwargs)
         elif cls.construct_props is not None:
             construct = cls.create(scope, construct_id, *args, **kwargs)
-            cls.post_create(construct)
         elif (
             cls.construct_lookup_props is not None
             and cls.construct_lookup_method is not None
@@ -102,7 +101,9 @@ class Resource(typing.Generic[ResourceType]):
     ) -> ResourceType:
         construct_class = cls.get_construct_class(*args, **kwargs)
         construct_props = cls.get_construct_props(*args, **kwargs)
+        cls.pre_create(construct_props)
         construct = construct_class(scope, construct_id, **construct_props)
+        cls.post_create(construct)
         return construct
 
     @classmethod
@@ -122,6 +123,10 @@ class Resource(typing.Generic[ResourceType]):
         construct_props = combine_configurations(construct_props)
         construct_props = cls.render_props(construct_props)
         return construct_props
+
+    @classmethod
+    def pre_create(cls, construct_props: dict) -> None:
+        pass
 
     @classmethod
     def post_create(cls, construct: ResourceType) -> None:

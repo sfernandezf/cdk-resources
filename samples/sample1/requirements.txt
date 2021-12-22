@@ -1,1 +1,0 @@
-aws-cdk.aws_sqs==1.135.0

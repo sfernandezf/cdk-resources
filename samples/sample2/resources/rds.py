@@ -16,7 +16,7 @@ class PostgreSqlParameterGroup(Resource[aws_rds.ParameterGroup]):
     construct_props = dict(
         default=dict(
             engine=aws_rds.DatabaseClusterEngine.aurora_postgres(
-                version=aws_rds.AuroraPostgresEngineVersion.VER_13_4
+                version=aws_rds.AuroraPostgresEngineVersion.VER_9_6_19
             ),
             description="Postgre Sql Parameter Group Parameter Group",
         )

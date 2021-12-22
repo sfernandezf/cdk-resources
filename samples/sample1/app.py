@@ -3,7 +3,7 @@ from aws_cdk import core
 
 from cdk_resources import register_stacks
 
-from stacks import DemoStack
+from .stacks import DemoStack
 
 
 # App
@@ -29,4 +29,4 @@ register_stacks(app, aws_env, STACKS)
 
 # Synth
 app.synth()
-print(app)
+

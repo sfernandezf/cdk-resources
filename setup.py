@@ -30,7 +30,7 @@ setuptools.setup(
     ),
     # package_dir={"": "cdk_resources"},
     package_data={"": ["LICENSE"]},
-    install_requires=["aws-cdk.core>=1.0.0", "boto3==1.20.23"],
+    install_requires=["aws-cdk.core>=1.110.0", "boto3==1.20.23"],
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 4 - Beta",
