@@ -2,7 +2,7 @@ import os
 import typing
 import functools
 
-from aws_cdk import core
+from aws_cdk import App
 
 
 # Constants
@@ -62,7 +62,7 @@ def get_context_variable(key: str) -> typing.Any:
 
 
 @functools.lru_cache(maxsize=None)
-def get_environment(app: typing.Optional[core.App]=None) -> typing.Optional[str]:
+def get_environment(app: typing.Optional[App]=None) -> typing.Optional[str]:
     environment =  (app or app_context["app"]).node.try_get_context(
         ENVIRONMENT_CONTEXT_KEY
     ) or os.getenv(ENVIRONMENT_CONTEXT_KEY.upper())

@@ -1,7 +1,8 @@
 import inspect
 import typing
 
-from aws_cdk import core
+from aws_cdk import App, Stack, Tags
+from constructs import Construct
 
 from cdk_resources.utils import combine_configurations, app_context
 
@@ -24,7 +25,7 @@ class Resource(typing.Generic[ResourceType]):
 
     def __new__(
         cls,
-        scope: typing.Optional[core.Stack] = None,
+        scope: typing.Optional[Stack] = None,
         construct_id: typing.Optional[str] = None,
         force_lookup: bool = False,
         *args,
@@ -33,7 +34,7 @@ class Resource(typing.Generic[ResourceType]):
         if hasattr(cls, "construct") and force_lookup is False:
             return cls
         scope = scope or app_context["current_stack"]
-        assert isinstance(scope, core.Stack), "Scope is required"
+        assert isinstance(scope, Stack), "Scope is required"
         assert isinstance(construct_id, str), "construct_id is required"
         if force_lookup is True:
             construct = cls.lookup(scope, construct_id, *args, **kwargs)
@@ -51,7 +52,7 @@ class Resource(typing.Generic[ResourceType]):
 
     def __init__(
         self: ResourceType,
-        scope: typing.Optional[core.Stack] = None,
+        scope: typing.Optional[Stack] = None,
         construct_id: typing.Optional[str] = None,
         force_lookup: bool = False,
         *args,
@@ -96,9 +97,7 @@ class Resource(typing.Generic[ResourceType]):
 
     # region Construct Create
     @classmethod
-    def create(
-        cls, scope: core.Stack, construct_id: str, *args, **kwargs
-    ) -> ResourceType:
+    def create(cls, scope: Stack, construct_id: str, *args, **kwargs) -> ResourceType:
         construct_class = cls.get_construct_class(*args, **kwargs)
         construct_props = cls.get_construct_props(*args, **kwargs)
         cls.pre_create(construct_props)
@@ -107,12 +106,10 @@ class Resource(typing.Generic[ResourceType]):
         return construct
 
     @classmethod
-    def get_construct_class(
-        cls, *args, **kwargs
-    ) -> typing.Type[core.Construct]:
+    def get_construct_class(cls, *args, **kwargs) -> typing.Type[Construct]:
         construct_class = cls.construct_class
         assert issubclass(
-            construct_class, core.Construct
+            construct_class, Construct
         ), "construct_class is required"
         return construct_class
 
@@ -136,7 +133,7 @@ class Resource(typing.Generic[ResourceType]):
 
     # region Lookup
     @classmethod
-    def lookup(cls, scope: core.Stack, construct_id: str, *args, **kwargs):
+    def lookup(cls, scope: Stack, construct_id: str, *args, **kwargs):
         construct_class = cls.get_construct_class(*args, **kwargs)
         construct_lookup_method = cls.get_construct_lookup_method(
             construct_class, *args, **kwargs
@@ -149,7 +146,7 @@ class Resource(typing.Generic[ResourceType]):
 
     @classmethod
     def get_construct_lookup_method(
-        cls, construct_class: core.Construct, *args, **kwargs
+        cls, construct_class: Construct, *args, **kwargs
     ) -> str:
         construct_lookup_method = cls.construct_lookup_method
         assert isinstance(
@@ -181,4 +178,4 @@ class ResourceTagMixin:
         super().post_create(construct)
         for key, value in cls.construct_tags or []:
             value = value if isinstance(value, str) else value()
-            core.Tags.of(construct).add(key, value)
+            Tags.of(construct).add(key, value)

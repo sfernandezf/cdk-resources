@@ -1,4 +1,4 @@
-from aws_cdk import aws_rds, core, aws_ec2
+from aws_cdk import aws_rds, aws_ec2, Duration, RemovalPolicy
 
 from cdk_resources import Resource
 
@@ -30,7 +30,7 @@ class PostgreSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
             engine=aws_rds.DatabaseClusterEngine.aurora_postgres(
                 version=aws_rds.AuroraPostgresEngineVersion.VER_13_4
             ),
-            backup=aws_rds.BackupProps(retention=core.Duration.days(3)),
+            backup=aws_rds.BackupProps(retention=Duration.days(3)),
             deletion_protection=True,
             instance_props=lambda: aws_rds.InstanceProps(
                 instance_type=aws_ec2.InstanceType.of(
@@ -50,11 +50,11 @@ class PostgreSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
             ),
             instances=1,
             port=5432,
-            removal_policy=core.RemovalPolicy.RETAIN,
+            removal_policy=RemovalPolicy.RETAIN,
             storage_encrypted=True,
         ),
         prod=dict(
-            backup=aws_rds.BackupProps(retention=core.Duration.days(30)),
+            backup=aws_rds.BackupProps(retention=Duration.days(30)),
             instances=2,
             vpc_subnets=lambda: aws_ec2.SubnetSelection(
                 subnets=[

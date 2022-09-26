@@ -1,5 +1,5 @@
 import os
-from aws_cdk import core
+from aws_cdk import App, Environment
 
 from cdk_resources import register_stacks
 
@@ -7,9 +7,9 @@ from .stacks import DemoStack
 
 
 # App
-app = core.App()
+app = App()
 # Env and stack
-aws_env = core.Environment(
+aws_env = Environment(
     account=os.environ["CDK_DEFAULT_ACCOUNT"],
     region=os.environ["CDK_DEFAULT_REGION"],
 )

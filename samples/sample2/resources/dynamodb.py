@@ -1,4 +1,6 @@
-from aws_cdk import aws_dynamodb, core
+from aws_cdk import aws_dynamodb, RemovalPolicy
+
+
 from cdk_resources import Resource
 
 
@@ -12,12 +14,12 @@ class DynamoTable(Resource[aws_dynamodb.Table]):
             ),
             billing_mode=aws_dynamodb.BillingMode.PAY_PER_REQUEST,
             point_in_time_recovery=True,
-            server_side_encryption=True,
+            encryption=aws_dynamodb.TableEncryption.DEFAULT,
             stream=aws_dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
             sort_key=aws_dynamodb.Attribute(
                 name="sort_key", type=aws_dynamodb.AttributeType.STRING
             ),
-            removal_policy=core.RemovalPolicy.RETAIN,
+            removal_policy=RemovalPolicy.RETAIN,
         )
     )
 

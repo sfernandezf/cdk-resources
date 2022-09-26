@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 
-from aws_cdk import core
+from aws_cdk import App, Environment
 import pytest
 
 from samples.sample1.stacks import DemoStack
@@ -44,9 +44,9 @@ def import_class(path):
 @pytest.mark.parametrize("name,stack_class,template_resources", TEST_DATA)
 def test_sample(name, stack_class, template_resources):
         stack = stack_class(
-            core.App(context=dict(environment="dev")),
+            App(context=dict(environment="dev")),
             name,
-            env=core.Environment(account="fake", region="us-east-1")
+            env=Environment(account="fake", region="us-east-1")
         )
         from aws_cdk.assertions import Template
         template = Template.from_stack(stack)

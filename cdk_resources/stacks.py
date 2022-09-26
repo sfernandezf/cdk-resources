@@ -1,7 +1,7 @@
 import functools
 import typing
 
-from aws_cdk import core
+from aws_cdk import App, Environment, Stack
 
 from cdk_resources.utils import (
     app_context,
@@ -13,14 +13,14 @@ from cdk_resources.utils import (
 __all__ = ["ResourceStack", "register_stacks"]
 
 
-class ResourceStack(core.Stack):
-    """ """
-
+class ResourceStack(Stack):
+    """
+    """
     EXISTING_RESOURCES = None
     RESOURCES = None
 
     def __init__(
-        self, scope: core.App, stack_id: str, **kwargs
+        self, scope: App, stack_id: str, **kwargs
     ) -> None:
         super().__init__(scope, stack_id, **kwargs)
         # Update Context
@@ -71,9 +71,7 @@ class ResourceStack(core.Stack):
         return environment is not None and environment in ALLOWED_ENVIRONMENTS
 
 
-def register_stacks(
-    app: core.App, aws_env: core.Environment, stacks: list
-) -> None:
+def register_stacks(app: App, aws_env: Environment, stacks: list) -> None:
     # Create Stacks
     for stack in stacks:
         stack_id, stack_class, stack_kwargs = (
