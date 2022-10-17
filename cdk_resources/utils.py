@@ -62,9 +62,17 @@ def get_context_variable(key: str) -> typing.Any:
 
 
 @functools.lru_cache(maxsize=None)
-def get_environment(app: typing.Optional[App]=None) -> typing.Optional[str]:
-    environment =  (app or app_context["app"]).node.try_get_context(
+def get_environment(app: typing.Optional[App] = None) -> typing.Optional[str]:
+    environment = (app or app_context["app"]).node.try_get_context(
         ENVIRONMENT_CONTEXT_KEY
     ) or os.getenv(ENVIRONMENT_CONTEXT_KEY.upper())
     app_context[ENVIRONMENT_CONTEXT_KEY] = environment
     return environment
+
+
+def env(mapping: {}, default=None):
+    return (
+        mapping.get(get_environment())
+        or default
+        or mapping.get(COMMON_ENVIRONMENT_KEY)
+    )

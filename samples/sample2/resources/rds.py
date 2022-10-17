@@ -1,8 +1,8 @@
 from aws_cdk import aws_rds, aws_ec2, Duration, RemovalPolicy
 
-from cdk_resources import Resource
+from cdk_resources import Resource, env
 
-from .ec2 import PostgreSqlRdsDatabaseSg
+from .ec2 import PostgresSqlRdsDatabaseSg
 from .vpc import (
     DefaultVpc,
     DefaultPrivateDbASubnet,
@@ -11,33 +11,44 @@ from .vpc import (
 )
 
 
-class PostgreSqlParameterGroup(Resource[aws_rds.ParameterGroup]):
-    construct_class = aws_rds.ParameterGroup
-    construct_props = dict(
-        default=dict(
+class PostgresSqlParameterGroup(Resource[aws_rds.ParameterGroup]):
+    """ """
+
+    # Main Construct
+    @classmethod
+    def construct(cls, **kwargs) -> aws_rds.ParameterGroup:
+        return aws_rds.ParameterGroup(
             engine=aws_rds.DatabaseClusterEngine.aurora_postgres(
                 version=aws_rds.AuroraPostgresEngineVersion.VER_9_6_19
             ),
             description="Postgre Sql Parameter Group Parameter Group",
+            **kwargs,
         )
-    )
 
 
-class PostgreSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
-    construct_class = aws_rds.DatabaseCluster
-    construct_props = dict(
-        default=dict(
+class PostgresSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
+    """ """
+
+    # Main Construct
+    @classmethod
+    def construct(cls, **kwargs) -> aws_rds.DatabaseCluster:
+        return aws_rds.DatabaseCluster(
+            backup=env(
+                default=aws_rds.BackupProps(retention=Duration.days(3)),
+                mapping=dict(
+                    prod=aws_rds.BackupProps(retention=Duration.days(30))
+                ),
+            ),
             engine=aws_rds.DatabaseClusterEngine.aurora_postgres(
                 version=aws_rds.AuroraPostgresEngineVersion.VER_13_4
             ),
-            backup=aws_rds.BackupProps(retention=Duration.days(3)),
             deletion_protection=True,
-            instance_props=lambda: aws_rds.InstanceProps(
+            instance_props=aws_rds.InstanceProps(
                 instance_type=aws_ec2.InstanceType.of(
                     aws_ec2.InstanceClass.BURSTABLE3,
                     aws_ec2.InstanceSize.MEDIUM,
                 ),
-                security_groups=[PostgreSqlRdsDatabaseSg.get()],
+                security_groups=[PostgresSqlRdsDatabaseSg.get()],
                 vpc=DefaultVpc.get(),
                 vpc_subnets=aws_ec2.SubnetSelection(
                     subnets=[
@@ -46,22 +57,13 @@ class PostgreSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
                         DefaultPrivateDbCSubnet.get(),
                     ]
                 ),
-                parameter_group=PostgreSqlParameterGroup().construct,
+                parameter_group=PostgresSqlParameterGroup.get(),
             ),
-            instances=1,
+            instances=env(default=1, mapping=dict(prod=2)),
             port=5432,
             removal_policy=RemovalPolicy.RETAIN,
             storage_encrypted=True,
-        ),
-        prod=dict(
-            backup=aws_rds.BackupProps(retention=Duration.days(30)),
-            instances=2,
-            vpc_subnets=lambda: aws_ec2.SubnetSelection(
-                subnets=[
-                    DefaultPrivateDbASubnet.get(),
-                    DefaultPrivateDbCSubnet.get(),
-                    DefaultPrivateDbCSubnet.get()
-                ]
-            ),
-        ),
-    )
+            **kwargs,
+        )
+
+    # Custom Environment Props

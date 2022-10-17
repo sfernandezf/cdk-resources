@@ -1,13 +1,15 @@
 from aws_cdk import aws_dynamodb, RemovalPolicy
 
-
 from cdk_resources import Resource
 
 
 class DynamoTable(Resource[aws_dynamodb.Table]):
-    construct_class = aws_dynamodb.Table
-    construct_props = dict(
-        default=dict(
+    """ """
+
+    # Main Construct
+    @classmethod
+    def construct(cls, **kwargs) -> aws_dynamodb.Table:
+        return aws_dynamodb.Table(
             table_name="dynamodb-table",
             partition_key=aws_dynamodb.Attribute(
                 name="partition_key", type=aws_dynamodb.AttributeType.STRING
@@ -20,6 +22,14 @@ class DynamoTable(Resource[aws_dynamodb.Table]):
                 name="sort_key", type=aws_dynamodb.AttributeType.STRING
             ),
             removal_policy=RemovalPolicy.RETAIN,
+            **kwargs,
         )
-    )
 
+    # Custom constructs
+    @classmethod
+    def construct_prod(cls, **kwargs):
+        return aws_dynamodb.Table.from_table_name(
+            table_name="dynamodb-table", **kwargs
+        )
+
+    # Custom Environment Props

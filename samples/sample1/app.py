@@ -29,4 +29,3 @@ register_stacks(app, aws_env, STACKS)
 
 # Synth
 app.synth()
-
