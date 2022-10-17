@@ -70,9 +70,8 @@ def get_environment(app: typing.Optional[App] = None) -> typing.Optional[str]:
     return environment
 
 
-def env(mapping: {}, default=None):
+def env(**kwargs):
     return (
-        mapping.get(get_environment())
-        or default
-        or mapping.get(COMMON_ENVIRONMENT_KEY)
+        kwargs.get(get_environment())
+        or kwargs.get(COMMON_ENVIRONMENT_KEY)
     )

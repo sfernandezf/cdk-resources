@@ -35,9 +35,7 @@ class PostgresSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
         return aws_rds.DatabaseCluster(
             backup=env(
                 default=aws_rds.BackupProps(retention=Duration.days(3)),
-                mapping=dict(
-                    prod=aws_rds.BackupProps(retention=Duration.days(30))
-                ),
+                prod=aws_rds.BackupProps(retention=Duration.days(30))
             ),
             engine=aws_rds.DatabaseClusterEngine.aurora_postgres(
                 version=aws_rds.AuroraPostgresEngineVersion.VER_13_4
@@ -59,7 +57,7 @@ class PostgresSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
                 ),
                 parameter_group=PostgresSqlParameterGroup.get(),
             ),
-            instances=env(default=1, mapping=dict(prod=2)),
+            instances=env(default=1, prod=2),
             port=5432,
             removal_policy=RemovalPolicy.RETAIN,
             storage_encrypted=True,
