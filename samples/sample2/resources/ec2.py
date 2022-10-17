@@ -5,15 +5,20 @@ from cdk_resources import Resource, ResourceType, combine_configurations
 from .vpc import DefaultVpc
 
 
-class PostgreSqlRdsDatabaseSg(Resource[aws_ec2.SecurityGroup]):
-    construct_class = aws_ec2.SecurityGroup
-    construct_props = dict(
-        default=dict(
-            vpc=lambda: DefaultVpc().construct,
+class PostgresSqlRdsDatabaseSg(Resource[aws_ec2.SecurityGroup]):
+    """ """
+
+    # Main Construct
+    @classmethod
+    def construct(cls, **kwargs) -> aws_ec2.SecurityGroup:
+        return aws_ec2.SecurityGroup(
+            vpc=DefaultVpc.get(),
             description="Postgre Sql Rds DatabaseSg",
             security_group_name="Postgre Sql Rds DatabaseSg",
+            **kwargs,
         )
-    )
+
+    # Others
     sg_ingress_rules_props = dict(
         default=dict(
             ingress_rules=[

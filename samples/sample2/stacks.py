@@ -1,8 +1,8 @@
 from cdk_resources import ResourceStack
 
 from .resources.dynamodb import DynamoTable
-from .resources.ec2 import PostgreSqlRdsDatabaseSg
-from .resources.rds import PostgreSqlRdsDatabase, PostgreSqlParameterGroup
+from .resources.ec2 import PostgresSqlRdsDatabaseSg
+from .resources.rds import PostgresSqlRdsDatabase, PostgresSqlParameterGroup
 from .resources.sns import SnsTopic
 from .resources.vpc import (
     DefaultVpc,
@@ -14,7 +14,7 @@ from .resources.vpc import (
 
 class Sample2Stack(ResourceStack):
     # fmt off
-    EXISTING_RESOURCES = [
+    IMPORT_RESOURCES = [
         ("vpc", DefaultVpc),
         ("subnet_db_a", DefaultPrivateDbASubnet),
         ("subnet_db_b", DefaultPrivateDbBSubnet),
@@ -25,9 +25,9 @@ class Sample2Stack(ResourceStack):
         # DynamoDB
         ("dynamodb", DynamoTable),
         # RDS
-        ("postgresql-sg", PostgreSqlRdsDatabaseSg),
-        ("postgresql-parameter-group", PostgreSqlParameterGroup),
-        ("postgresqlDb", PostgreSqlRdsDatabase),
+        ("postgresql-sg", PostgresSqlRdsDatabaseSg),
+        ("postgresql-parameter-group", PostgresSqlParameterGroup),
+        ("postgresqlDb", PostgresSqlRdsDatabase),
         # SNS
         ("sns-topic", SnsTopic),
     ]

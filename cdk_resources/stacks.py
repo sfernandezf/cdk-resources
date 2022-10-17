@@ -15,13 +15,13 @@ __all__ = ["ResourceStack", "register_stacks"]
 
 class ResourceStack(Stack):
     """
+    Base Resource Stack
     """
-    EXISTING_RESOURCES = None
+
+    IMPORT_RESOURCES = None
     RESOURCES = None
 
-    def __init__(
-        self, scope: App, stack_id: str, **kwargs
-    ) -> None:
+    def __init__(self, scope: App, stack_id: str, **kwargs) -> None:
         super().__init__(scope, stack_id, **kwargs)
         # Update Context
         app_context.update(app=scope, current_stack=self)
@@ -31,8 +31,8 @@ class ResourceStack(Stack):
                 f"values {ALLOWED_ENVIRONMENTS}"
             )
 
-        # Existing resources
-        for resources in self.EXISTING_RESOURCES or []:
+        # Import resources
+        for resources in self.IMPORT_RESOURCES or []:
             resource_name, Resource, resource_attrs = (
                 self.get_resource_name(resources[0]),
                 resources[1],
