@@ -1,4 +1,4 @@
-from aws_cdk import aws_dynamodb, RemovalPolicy
+from aws_cdk import aws_dynamodb, RemovalPolicy, Stack
 
 from cdk_resources import Resource
 
@@ -8,8 +8,10 @@ class DynamoTable(Resource[aws_dynamodb.Table]):
 
     # Main Construct
     @classmethod
-    def construct(cls, **kwargs) -> aws_dynamodb.Table:
+    def construct(cls, scope: Stack, id: str, **kwargs) -> aws_dynamodb.Table:
         return aws_dynamodb.Table(
+            scope=scope,
+            id=id,
             table_name="dynamodb-table",
             partition_key=aws_dynamodb.Attribute(
                 name="partition_key", type=aws_dynamodb.AttributeType.STRING
@@ -27,9 +29,9 @@ class DynamoTable(Resource[aws_dynamodb.Table]):
 
     # Custom constructs
     @classmethod
-    def construct_prod(cls, **kwargs):
+    def construct_prod(cls, scope: Stack, id: str, **kwargs):
         return aws_dynamodb.Table.from_table_name(
-            table_name="dynamodb-table", **kwargs
+            scope=scope, id=id, table_name="dynamodb-table", **kwargs
         )
 
     # Custom Environment Props

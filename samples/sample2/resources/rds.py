@@ -1,4 +1,4 @@
-from aws_cdk import aws_rds, aws_ec2, Duration, RemovalPolicy
+from aws_cdk import aws_rds, aws_ec2, Duration, RemovalPolicy, Stack
 
 from cdk_resources import Resource, env
 
@@ -16,8 +16,10 @@ class PostgresSqlParameterGroup(Resource[aws_rds.ParameterGroup]):
 
     # Main Construct
     @classmethod
-    def construct(cls, **kwargs) -> aws_rds.ParameterGroup:
+    def construct(cls, scope: Stack, id: str, **kwargs) -> aws_rds.ParameterGroup:
         return aws_rds.ParameterGroup(
+            scope,
+            id,
             engine=aws_rds.DatabaseClusterEngine.aurora_postgres(
                 version=aws_rds.AuroraPostgresEngineVersion.VER_9_6_19
             ),
@@ -31,8 +33,10 @@ class PostgresSqlRdsDatabase(Resource[aws_rds.DatabaseCluster]):
 
     # Main Construct
     @classmethod
-    def construct(cls, **kwargs) -> aws_rds.DatabaseCluster:
+    def construct(cls, scope: Stack, id: str, **kwargs) -> aws_rds.DatabaseCluster:
         return aws_rds.DatabaseCluster(
+            scope=scope,
+            id=id,
             backup=env(
                 default=aws_rds.BackupProps(retention=Duration.days(3)),
                 prod=aws_rds.BackupProps(retention=Duration.days(30))

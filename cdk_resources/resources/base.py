@@ -25,7 +25,7 @@ class Resource(typing.Generic[ResourceType], abc.ABC):
     # Main Construct (Required)
     @classmethod
     @abc.abstractmethod
-    def construct(cls, **kwargs) -> ResourceType:
+    def construct(cls, scope: Stack, id: str, **kwargs) -> ResourceType:
         pass
 
     # Environment Props

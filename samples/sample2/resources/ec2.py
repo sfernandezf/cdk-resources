@@ -1,4 +1,4 @@
-from aws_cdk import aws_ec2
+from aws_cdk import aws_ec2, Stack
 
 from cdk_resources import Resource, ResourceType, combine_configurations
 
@@ -10,8 +10,10 @@ class PostgresSqlRdsDatabaseSg(Resource[aws_ec2.SecurityGroup]):
 
     # Main Construct
     @classmethod
-    def construct(cls, **kwargs) -> aws_ec2.SecurityGroup:
+    def construct(cls, scope: Stack, id: str, **kwargs) -> aws_ec2.SecurityGroup:
         return aws_ec2.SecurityGroup(
+            scope=scope,
+            id=id,
             vpc=DefaultVpc.get(),
             description="Postgre Sql Rds DatabaseSg",
             security_group_name="Postgre Sql Rds DatabaseSg",

@@ -1,4 +1,4 @@
-from aws_cdk import aws_sqs
+from aws_cdk import aws_sqs, Stack
 
 from cdk_resources import Resource, ResourceTagMixin, get_environment
 
@@ -10,5 +10,5 @@ class TestQueue(ResourceTagMixin, Resource[aws_sqs.Queue]):
 
     # Main Construct
     @classmethod
-    def construct(cls, **kwargs) -> aws_sqs.Queue:
-        return aws_sqs.Queue(queue_name="test", **kwargs)
+    def construct(cls, scope: Stack, id: str, **kwargs) -> aws_sqs.Queue:
+        return aws_sqs.Queue(scope=scope, id=id, queue_name="test", **kwargs)
