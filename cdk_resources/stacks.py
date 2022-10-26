@@ -32,7 +32,7 @@ class ResourceStack(Stack):
             )
 
         # Import resources
-        for resources in self.IMPORT_RESOURCES or []:
+        for resources in self.get_import_resources() or []:
             resource_name, Resource, resource_attrs = (
                 self.get_resource_name(resources[0]),
                 resources[1],
@@ -49,7 +49,7 @@ class ResourceStack(Stack):
             )
 
         # Own Resources
-        for resources in self.RESOURCES or []:
+        for resources in self.get_resources() or []:
             resource_name, Resource, resource_attrs = (
                 self.get_resource_name(resources[0]),
                 resources[1],
@@ -57,6 +57,25 @@ class ResourceStack(Stack):
             )
             resource = Resource(scope=self, construct_id=resource_name)
             setattr(self, resource_name, resource)
+
+    @classmethod
+    def get_dynamic_resources(cls, resource_attr: str = "resources"):
+        env = get_environment().lower()
+        import_resources_attr = f"{env.upper()}_{resource_attr.upper()}"
+        import_resources_method = f"get_{env}_{resource_attr.lower()}"
+        if callable(getattr(cls, import_resources_method, None)):
+            return getattr(cls, import_resources_method)()
+        elif isinstance(getattr(cls, import_resources_attr, None), str):
+            return getattr(cls, import_resources_attr)
+        return getattr(cls, resource_attr.upper())
+
+    @classmethod
+    def get_import_resources(cls):
+        return cls.get_dynamic_resources("import_resources")
+
+    @classmethod
+    def get_resources(cls):
+        return cls.get_dynamic_resources("resources")
 
     @staticmethod
     def get_resource_name(value: typing.Union[str, typing.Callable]) -> str:
