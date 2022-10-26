@@ -61,12 +61,12 @@ class ResourceStack(Stack):
     @classmethod
     def get_dynamic_resources(cls, resource_attr: str = "resources"):
         env = get_environment().lower()
-        import_resources_attr = f"{env.upper()}_{resource_attr.upper()}"
-        import_resources_method = f"get_{env}_{resource_attr.lower()}"
-        if callable(getattr(cls, import_resources_method, None)):
-            return getattr(cls, import_resources_method)()
-        elif isinstance(getattr(cls, import_resources_attr, None), str):
-            return getattr(cls, import_resources_attr)
+        env_resources_attr = getattr(cls, f"{env.upper()}_{resource_attr.upper()}", None)
+        env_resources_method = getattr(cls, f"get_{env}_{resource_attr.lower()}", None)
+        if callable(env_resources_method):
+            return env_resources_method()
+        elif type(env_resources_attr) in [list, tuple]:
+            return env_resources_attr
         return getattr(cls, resource_attr.upper())
 
     @classmethod
