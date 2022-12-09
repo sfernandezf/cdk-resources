@@ -16,6 +16,10 @@ ENVIRONMENT_CONTEXT_KEY = os.environ.get(
 app_context = {}
 
 
+aws_account = os.environ.get("CDK_DEFAULT_ACCOUNT")
+aws_region = os.environ.get("CDK_DEFAULT_ACCOUNT")
+
+
 def combine_configurations(
     config: typing.Any,
     key: typing.Optional[str] = None,
@@ -24,6 +28,11 @@ def combine_configurations(
     exclude_keys = exclude_keys or []
 
     def filter_config(conf: dict) -> dict:
+        if aws_account and aws_account in conf:
+            return filter_config(conf[aws_account])
+        elif aws_region and aws_region in conf:
+            return filter_config(conf[aws_account])
+
         filtered_config = {
             k: v for k, v in conf.items() if k not in exclude_keys
         }
@@ -71,7 +80,22 @@ def get_environment(app: typing.Optional[App] = None) -> typing.Optional[str]:
 
 
 def env(**kwargs):
-    return (
-        kwargs.get(get_environment())
-        or kwargs.get(COMMON_ENVIRONMENT_KEY)
-    )
+    if aws_account and aws_account in kwargs:
+        return env(**kwargs.get(aws_account))
+    elif aws_region and aws_region in kwargs:
+        return env(**kwargs.get(aws_account))
+    environment = get_environment()
+    if environment in kwargs:
+        return kwargs.get(environment)
+    elif COMMON_ENVIRONMENT_KEY in kwargs:
+        return kwargs.get(COMMON_ENVIRONMENT_KEY)
+    return kwargs
+
+
+@functools.lru_cache(maxsize=None)
+def context_var(var: str, default: typing.Any = None, app: typing.Optional[App] = None, required: bool = False) -> typing.Optional[str]:
+    app = app or app_context["app"]
+    value = app.node.try_get_context(var) or os.getenv(var)  or default
+    if value is None and required:
+        raise Exception(f"{var} context variable is required")
+    return value
