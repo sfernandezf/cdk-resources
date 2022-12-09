@@ -17,7 +17,7 @@ app_context = {}
 
 
 aws_account = os.environ.get("CDK_DEFAULT_ACCOUNT")
-aws_region = os.environ.get("CDK_DEFAULT_ACCOUNT")
+aws_region = os.environ.get("CDK_DEFAULT_REGION")
 
 
 def combine_configurations(
@@ -31,7 +31,7 @@ def combine_configurations(
         if aws_account and aws_account in conf:
             return filter_config(conf[aws_account])
         elif aws_region and aws_region in conf:
-            return filter_config(conf[aws_account])
+            return filter_config(conf[aws_region])
 
         filtered_config = {
             k: v for k, v in conf.items() if k not in exclude_keys
