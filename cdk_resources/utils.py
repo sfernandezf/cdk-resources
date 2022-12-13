@@ -80,16 +80,24 @@ def get_environment(app: typing.Optional[App] = None) -> typing.Optional[str]:
 
 
 def env(**kwargs):
-    if aws_account and aws_account in kwargs:
-        return env(**kwargs.get(aws_account))
-    elif aws_region and aws_region in kwargs:
-        return env(**kwargs.get(aws_account))
+    """
+    """
     environment = get_environment()
-    if environment in kwargs:
-        return kwargs.get(environment)
-    elif COMMON_ENVIRONMENT_KEY in kwargs:
-        return kwargs.get(COMMON_ENVIRONMENT_KEY)
-    return kwargs
+
+    def filter_env(conf: dict):
+        if not isinstance(conf, dict):
+            return conf
+        if environment in conf:
+            return filter_env(conf.get(environment))
+        if aws_account and aws_account in conf:
+            return filter_env(conf.get(aws_account))
+        if aws_region and aws_region in conf:
+            return filter_env(conf.get(aws_region))
+        if COMMON_ENVIRONMENT_KEY in conf:
+            return filter_env(conf.get(COMMON_ENVIRONMENT_KEY))
+        return conf
+
+    return filter_env(kwargs)
 
 
 @functools.lru_cache(maxsize=None)
