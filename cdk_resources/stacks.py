@@ -61,6 +61,7 @@ class ResourceStack(Stack):
     @classmethod
     def get_dynamic_resources(cls, resource_attr: str = "resources"):
         env = get_environment().lower()
+        env = env.replace("-", "_")
         env_resources_attr = getattr(cls, f"{env.upper()}_{resource_attr.upper()}", None)
         env_resources_method = getattr(cls, f"get_{env}_{resource_attr.lower()}", None)
         if callable(env_resources_method):
